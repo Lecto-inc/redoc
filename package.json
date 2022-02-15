@@ -41,7 +41,7 @@
     "ts-check": "tsc --noEmit --skipLibCheck",
     "cy:open": "cypress open",
     "bundle:clean": "rimraf bundles",
-    "bundle:standalone": "webpack --env production --env standalone --mode=production",
+    "bundle:standalone": "export NODE_OPTIONS=--openssl-legacy-provider; webpack --env production --env standalone --mode=production",
     "bundle:lib": "webpack --mode=production && npm run declarations",
     "bundle:browser": "webpack --env production --env browser --mode=production",
     "bundle": "npm run bundle:clean && npm run bundle:lib && npm run bundle:browser && npm run bundle:standalone",

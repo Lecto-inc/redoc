@@ -5,7 +5,8 @@
 # npm i -g http-server
 # http-server -p 8000 --cors
 
-FROM node:alpine
+# for arm64
+FROM --platform=linux/arm64 node:alpine
 
 RUN apk update && apk add --no-cache git
 
@@ -20,6 +21,26 @@ COPY webpack.config.ts tsconfig.json custom.d.ts  /build/
 COPY config/webpack-utils.ts /build/config/
 COPY typings/styled-patch.d.ts /build/typings/styled-patch.d.ts
 
+RUN npm install esbuild-linux-arm64
+RUN npm run bundle:standalone
+
+# for amd64
+FROM --platform=linux/x86_64 node:alpine
+
+RUN apk update && apk add --no-cache git
+
+# Install dependencies
+WORKDIR /build
+COPY package.json package-lock.json /build/
+RUN npm ci --no-optional --ignore-scripts
+
+# copy only required for the build files
+COPY src /build/src
+COPY webpack.config.ts tsconfig.json custom.d.ts  /build/
+COPY config/webpack-utils.ts /build/config/
+COPY typings/styled-patch.d.ts /build/typings/styled-patch.d.ts
+
+RUN npm install esbuild-linux-64
 RUN npm run bundle:standalone
 
 FROM nginx:alpine
